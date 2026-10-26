@@ -1,0 +1,1644 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>奇幻數數大冒險・1~30 數字樂園</title>
+  <!-- Tailwind CSS provided by gstatic -->
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-8px) rotate(1.5deg); }
+    }
+    @keyframes chew {
+      0%, 100% { transform: scale(1); }
+      30% { transform: scale(1.15, 0.88); }
+      60% { transform: scale(0.92, 1.1); }
+    }
+    @keyframes hop {
+      0% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-24px) scale(1.1, 0.95); }
+      100% { transform: translateY(0) scale(1); }
+    }
+    @keyframes wrong-shake {
+      0%, 100% { transform: translateX(0); }
+      15%, 45%, 75% { transform: translateX(-10px) rotate(-1deg); }
+      30%, 60%, 90% { transform: translateX(10px) rotate(1deg); }
+    }
+    @keyframes pop-sparkle {
+      0% { transform: scale(0.4); opacity: 0; }
+      70% { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    @keyframes heart-rise {
+      0% { transform: translateY(0) scale(0.6); opacity: 1; }
+      100% { transform: translateY(-40px) scale(1.2); opacity: 0; }
+    }
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
+      70% { transform: scale(1.05); box-shadow: 0 0 0 12px rgba(245, 158, 11, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+    }
+
+    .animate-float { animation: float 3.5s ease-in-out infinite; }
+    .animate-chew { animation: chew 0.45s ease-in-out; }
+    .animate-hop { animation: hop 0.4s ease-out; }
+    .animate-shake { animation: wrong-shake 0.6s ease-in-out; }
+    .animate-pop { animation: pop-sparkle 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    .animate-pulse-ring { animation: pulse-ring 1.8s infinite; }
+
+    /* Custom Scrollbar */
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: rgba(241, 245, 249, 0.6);
+      border-radius: 8px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 8px;
+    }
+
+    /* Prevent accidental text selection during multi-tap */
+    .no-select {
+      user-select: none;
+      -webkit-user-select: none;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-amber-100 via-sky-100 to-rose-100 min-h-screen text-slate-800 font-sans p-2 sm:p-4 antialiased no-select">
+
+  <!-- Main App Container -->
+  <div class="max-w-5xl mx-auto flex flex-col gap-3 sm:gap-4 relative">
+
+    <!-- Top Global Header Bar -->
+    <header class="bg-white/95 backdrop-blur-md rounded-3xl p-3 sm:p-4 shadow-lg border-2 border-amber-200 flex flex-wrap items-center justify-between gap-3">
+      <!-- Title & Branding -->
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-400 to-rose-400 flex items-center justify-center text-3xl shadow-md text-white animate-float">
+          🎡
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-xl sm:text-2xl font-black bg-gradient-to-r from-amber-600 via-rose-500 to-sky-600 bg-clip-text text-transparent">
+              奇幻數數大冒險
+            </h1>
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-black bg-amber-100 text-amber-800 border border-amber-300">
+              1 ~ 30 數字樂園
+            </span>
+          </div>
+          <p class="text-xs sm:text-sm text-slate-500 font-bold">
+            聽讀唱數・趣味配對・動物餵食・大富翁對決！
+          </p>
+        </div>
+      </div>
+
+      <!-- Score & Action Buttons -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Cumulative Score Pill -->
+        <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-amber-50 border-2 border-amber-300 shadow-sm">
+          <span class="text-lg">⭐</span>
+          <div class="flex flex-col leading-tight">
+            <span class="text-[10px] font-black text-amber-600 uppercase">冒險點數</span>
+            <span id="current-score-text" class="text-base sm:text-lg font-black text-amber-700">0</span>
+          </div>
+        </div>
+
+        <!-- High Score Badge -->
+        <div class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-rose-50 border-2 border-rose-200">
+          <span class="text-lg">🏆</span>
+          <div class="flex flex-col leading-tight">
+            <span class="text-[10px] font-black text-rose-500">歷史最高</span>
+            <span id="high-score-text" class="text-base font-black text-rose-600">0</span>
+          </div>
+        </div>
+
+        <!-- Home Button (If inside a round) -->
+        <button id="nav-home-btn" class="p-2 sm:px-3 sm:py-2 rounded-2xl bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 font-bold text-xs sm:text-sm transition flex items-center gap-1 border border-slate-300" title="回主頁面">
+          <span>🏠</span>
+          <span class="hidden sm:inline">主頁</span>
+        </button>
+
+        <!-- Sound & Voice Toggles -->
+        <button id="voice-toggle-btn" class="p-2 sm:p-2.5 rounded-2xl bg-sky-50 hover:bg-sky-100 active:scale-95 text-sky-700 font-black text-sm transition border border-sky-200" title="語音開關">
+          🗣️
+        </button>
+        <button id="sound-toggle-btn" class="p-2 sm:p-2.5 rounded-2xl bg-amber-50 hover:bg-amber-100 active:scale-95 text-amber-700 font-black text-sm transition border border-amber-200" title="音效開關">
+          🔔
+        </button>
+      </div>
+    </header>
+
+    <!-- ================================================================= -->
+    <!-- VIEW 1: HOME PAGE / ROUND SELECTION -->
+    <!-- ================================================================= -->
+    <main id="home-view" class="flex flex-col gap-4">
+      <!-- Welcome Hero Banner -->
+      <div class="bg-gradient-to-r from-amber-400 via-rose-400 to-sky-400 rounded-3xl p-5 sm:p-7 text-white shadow-xl relative overflow-hidden flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="z-10 text-center sm:text-left">
+          <span class="px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm text-xs font-black tracking-wide uppercase">
+            30 題大挑戰・歡樂練習
+          </span>
+          <h2 class="text-2xl sm:text-4xl font-black mt-2 drop-shadow-sm">
+            準備好開始數數了嗎？
+          </h2>
+          <p class="text-xs sm:text-sm text-white/90 font-bold mt-1.5 max-w-md">
+            每回合開始前，可愛小導師都會先帶你朗讀 1 到 30！完成 30 題即可累積專屬金幣與徽章！
+          </p>
+        </div>
+        <div class="text-6xl sm:text-7xl animate-float drop-shadow-md">
+          🐰🌟🚀
+        </div>
+      </div>
+
+      <!-- 3 Round Cards Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        
+        <!-- Round 1 Card -->
+        <div class="bg-white/95 rounded-3xl p-5 shadow-lg border-2 border-emerald-200 hover:border-emerald-400 transition flex flex-col justify-between gap-4 relative overflow-hidden group">
+          <div class="flex items-center justify-between">
+            <span class="px-3 py-1 rounded-full text-xs font-black bg-emerald-100 text-emerald-800">
+              第一回合・共 30 題
+            </span>
+            <span class="text-3xl">🍓</span>
+          </div>
+          <div>
+            <h3 class="text-xl font-black text-emerald-900 group-hover:text-emerald-600 transition">
+              物品數量配對
+            </h3>
+            <p class="text-xs text-slate-500 font-bold mt-1 leading-relaxed">
+              畫面呈現不同數量的物品，右邊自己動手放同樣數量，邊放邊唱數，最後填入總數！
+            </p>
+          </div>
+          <div class="bg-emerald-50 rounded-2xl p-2.5 flex items-center gap-2 text-xs font-bold text-emerald-700">
+            <span>✨</span>
+            <span>支援標記點數與虛擬鍵盤！</span>
+          </div>
+          <button onclick="Game.startRound(1)" class="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 active:scale-95 text-white font-black text-sm rounded-2xl shadow-md transition flex items-center justify-center gap-2">
+            <span>進入第一回合</span>
+            <span>▶</span>
+          </button>
+        </div>
+
+        <!-- Round 2 Card -->
+        <div class="bg-white/95 rounded-3xl p-5 shadow-lg border-2 border-amber-200 hover:border-amber-400 transition flex flex-col justify-between gap-4 relative overflow-hidden group">
+          <div class="flex items-center justify-between">
+            <span class="px-3 py-1 rounded-full text-xs font-black bg-amber-100 text-amber-800">
+              第二回合・共 30 題
+            </span>
+            <span class="text-3xl">🐶</span>
+          </div>
+          <div>
+            <h3 class="text-xl font-black text-amber-900 group-hover:text-amber-600 transition">
+              萌寵飼料餵食秀 (基數 30)
+            </h3>
+            <p class="text-xs text-slate-500 font-bold mt-1 leading-relaxed">
+              盤中有 30 份飼料，純圖片無數字干擾！按一張飼料圖片就直接消失，邊餵邊唱數，滿足指定數量！
+            </p>
+          </div>
+          <div class="bg-amber-50 rounded-2xl p-2.5 flex items-center gap-2 text-xs font-bold text-amber-700">
+            <span>🦴</span>
+            <span>按一下少一個・生動咀嚼與唱數！</span>
+          </div>
+          <button onclick="Game.startRound(2)" class="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 active:scale-95 text-white font-black text-sm rounded-2xl shadow-md transition flex items-center justify-center gap-2">
+            <span>進入第二回合</span>
+            <span>▶</span>
+          </button>
+        </div>
+
+        <!-- Round 3 Card -->
+        <div class="bg-white/95 rounded-3xl p-5 shadow-lg border-2 border-indigo-200 hover:border-indigo-400 transition flex flex-col justify-between gap-4 relative overflow-hidden group">
+          <div class="flex items-center justify-between">
+            <span class="px-3 py-1 rounded-full text-xs font-black bg-indigo-100 text-indigo-800">
+              第三回合・共 30 題
+            </span>
+            <span class="text-3xl">🐰</span>
+          </div>
+          <div>
+            <h3 class="text-xl font-black text-indigo-900 group-hover:text-indigo-600 transition">
+              大富翁動物跳跳賽 (起點 0)
+            </h3>
+            <p class="text-xs text-slate-500 font-bold mt-1 leading-relaxed">
+              萌小兔與小熊比拼！起點為 0，按一下角色就前進一步，直觀看著地圖格子邊走邊數！
+            </p>
+          </div>
+          <div class="bg-indigo-50 rounded-2xl p-2.5 flex items-center gap-2 text-xs font-bold text-indigo-700">
+            <span>🏁</span>
+            <span>可愛動物賽跑・按一下前進一步！</span>
+          </div>
+          <button onclick="Game.startRound(3)" class="w-full py-3 bg-gradient-to-r from-indigo-500 to-sky-500 hover:from-indigo-600 hover:to-sky-600 active:scale-95 text-white font-black text-sm rounded-2xl shadow-md transition flex items-center justify-center gap-2">
+            <span>進入第三回合</span>
+            <span>▶</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Quick Reset All Progress Pill -->
+      <div class="flex items-center justify-center gap-3 mt-2">
+        <button id="reset-all-data-btn" class="text-xs font-bold text-slate-400 hover:text-rose-500 underline transition">
+          ↺ 清除歷史冒險紀錄重新開始
+        </button>
+      </div>
+    </main>
+
+    <!-- ================================================================= -->
+    <!-- WARMUP STAGE MODAL: 1 to 30 READ-ALOUD (Before each round) -->
+    <!-- ================================================================= -->
+    <div id="warmup-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-5 hidden">
+      <div class="bg-white rounded-3xl p-5 sm:p-6 max-w-xl w-full shadow-2xl border-4 border-amber-300 flex flex-col gap-4 relative animate-pop">
+        
+        <!-- Warmup Header -->
+        <div class="flex items-center justify-between border-b border-amber-100 pb-3">
+          <div class="flex items-center gap-2.5">
+            <span class="text-2xl animate-bounce">📢</span>
+            <div>
+              <h3 class="text-lg sm:text-xl font-black text-amber-900">
+                回合前熱身：一起朗讀 1 到 30！
+              </h3>
+              <p class="text-xs text-slate-500 font-bold">
+                跟著發音一起大聲唸出來，為數數做好準備！
+              </p>
+            </div>
+          </div>
+          <button id="skip-warmup-btn" class="px-3 py-1.5 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 text-xs font-black transition shrink-0 active:scale-95">
+            ⏩ 略過熱身直接挑戰
+          </button>
+        </div>
+
+        <!-- 1-30 Numbers Grid -->
+        <div id="warmup-grid" class="grid grid-cols-6 sm:grid-cols-6 gap-2 max-h-72 overflow-y-auto custom-scrollbar p-1">
+          <!-- 30 Number buttons dynamically generated -->
+        </div>
+
+        <!-- Current Spoken Status -->
+        <div class="bg-amber-50 rounded-2xl p-3 border border-amber-200 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="text-xl">🎙️</span>
+            <span class="text-xs font-bold text-amber-800">
+              目前朗讀：<strong id="warmup-curr-num" class="text-base text-rose-600 font-black">準備開始...</strong>
+            </span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <button id="replay-warmup-btn" class="px-2.5 py-1 bg-white border border-amber-300 rounded-lg text-xs font-bold text-amber-700 hover:bg-amber-100">
+              🔄 重新朗讀
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ================================================================= -->
+    <!-- VIEW 2: ACTIVE GAME PLAY AREA (Shared wrapper for Round 1, 2, 3) -->
+    <!-- ================================================================= -->
+    <div id="game-view" class="flex flex-col gap-3 hidden">
+      
+      <!-- Stage Info Bar (Round, Question Progress, Restart) -->
+      <div class="bg-white/95 rounded-2xl p-3 shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-2">
+          <span id="game-round-badge" class="px-3 py-1 rounded-xl text-xs font-black bg-emerald-600 text-white">
+            第一回合：物品數量配對
+          </span>
+          <span class="text-xs font-bold text-slate-500">
+            第 <span id="game-q-curr" class="text-indigo-600 font-black text-sm">1</span> / 30 題
+          </span>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="flex-1 max-w-xs bg-slate-100 h-2.5 rounded-full overflow-hidden border border-slate-200">
+          <div id="game-q-progressbar" class="bg-gradient-to-r from-amber-400 to-rose-500 h-full w-[3.33%] transition-all duration-300"></div>
+        </div>
+
+        <!-- Control Buttons -->
+        <div class="flex items-center gap-2">
+          <button id="restart-round-btn" class="px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold transition flex items-center gap-1">
+            <span>↺</span>
+            <span>重玩此回合</span>
+          </button>
+          <button id="exit-round-btn" class="px-2.5 py-1 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold transition border border-rose-200 flex items-center gap-1">
+            <span>✕</span>
+            <span>結束回主頁</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ------------------------------------------------------------- -->
+      <!-- ROUND 1 PANEL: Item Matching & Counting -->
+      <!-- ------------------------------------------------------------- -->
+      <section id="panel-round-1" class="flex flex-col gap-3">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4">
+          
+          <!-- LEFT: Target Items Display (6 cols) -->
+          <div class="lg:col-span-6 bg-white/95 rounded-3xl p-4 sm:p-5 shadow-md border-2 border-emerald-200 flex flex-col gap-3">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+              <div class="flex items-center gap-2">
+                <span class="text-xl">👀</span>
+                <h3 class="font-black text-slate-800 text-sm sm:text-base">
+                  題目：數數看左邊一共有幾個？
+                </h3>
+              </div>
+              <button id="r1-read-left-btn" class="px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold rounded-xl border border-emerald-200 flex items-center gap-1 transition">
+                <span>🔊</span>
+                <span>唸題目</span>
+              </button>
+            </div>
+
+            <!-- Left Items Container Board -->
+            <div class="relative bg-slate-50/80 rounded-2xl p-3 border-2 border-dashed border-emerald-200 min-h-[220px] max-h-[280px] overflow-y-auto custom-scrollbar flex items-center justify-center">
+              <div id="r1-target-items-grid" class="flex flex-wrap items-center justify-center gap-2 p-2 w-full">
+                <!-- Injected items -->
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between text-xs text-slate-400 font-bold px-1">
+              <span>💡 提示：點擊左邊物品可以打勾標記編號，不怕數漏！</span>
+              <button id="r1-clear-mark-btn" class="text-emerald-600 hover:underline">清除標記</button>
+            </div>
+          </div>
+
+          <!-- RIGHT: Player's Basket (Put Same Count) (6 cols) -->
+          <div class="lg:col-span-6 bg-white/95 rounded-3xl p-4 sm:p-5 shadow-md border-2 border-sky-200 flex flex-col gap-3">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+              <div class="flex items-center gap-2">
+                <span class="text-xl">🧺</span>
+                <h3 class="font-black text-slate-800 text-sm sm:text-base">
+                  你的籃子：請放入同樣數量的物品
+                </h3>
+              </div>
+              <span class="text-xs font-black bg-sky-100 text-sky-800 px-2.5 py-0.5 rounded-full">
+                目前放了：<span id="r1-basket-count" class="text-sm text-sky-600">0</span> 個
+              </span>
+            </div>
+
+            <!-- Basket Display Area -->
+            <div id="r1-basket-shelf" class="bg-sky-50/60 rounded-2xl p-3 border-2 border-dashed border-sky-200 min-h-[140px] max-h-[160px] overflow-y-auto custom-scrollbar flex flex-wrap items-center justify-center gap-1.5 relative">
+              <span id="r1-empty-tip" class="text-xs text-sky-400 font-bold">點擊下方按鈕把物品放進籃子裡~</span>
+            </div>
+
+            <!-- Action Controls to add/remove items -->
+            <div class="grid grid-cols-4 gap-2">
+              <button id="r1-add-one-btn" class="py-2.5 bg-sky-500 hover:bg-sky-600 active:scale-95 text-white font-black text-xs sm:text-sm rounded-xl shadow-sm transition flex flex-col items-center">
+                <span>➕ 放 1 個</span>
+                <span class="text-[10px] text-sky-100 font-normal">唱數加一</span>
+              </button>
+              <button id="r1-add-five-btn" class="py-2.5 bg-indigo-500 hover:bg-indigo-600 active:scale-95 text-white font-black text-xs sm:text-sm rounded-xl shadow-sm transition flex flex-col items-center">
+                <span>⚡ 放 5 個</span>
+                <span class="text-[10px] text-indigo-100 font-normal">快速連加</span>
+              </button>
+              <button id="r1-sub-one-btn" class="py-2.5 bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 font-bold text-xs sm:text-sm rounded-xl transition flex flex-col items-center border border-slate-300">
+                <span>➖ 拿走 1 個</span>
+                <span class="text-[10px] text-slate-400 font-normal">減去一個</span>
+              </button>
+              <button id="r1-clear-basket-btn" class="py-2.5 bg-rose-50 hover:bg-rose-100 active:scale-95 text-rose-700 font-bold text-xs sm:text-sm rounded-xl transition flex flex-col items-center border border-rose-200">
+                <span>🗑️ 清空籃子</span>
+                <span class="text-[10px] text-rose-400 font-normal">重新放起</span>
+              </button>
+            </div>
+
+            <!-- Input Final Number and Submit -->
+            <div class="bg-amber-50 rounded-2xl p-3 border border-amber-200 flex flex-col gap-2">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-black text-amber-900">最後一步：輸入物品的正確數量數字</span>
+                <span class="text-[11px] text-amber-600 font-bold">範圍 1~30</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <div class="flex-1 flex items-center bg-white rounded-xl border-2 border-amber-300 px-3 py-1.5 focus-within:border-amber-500">
+                  <span class="text-amber-500 font-black mr-2">總數 =</span>
+                  <input id="r1-number-input" type="number" min="1" max="30" placeholder="填入數量" class="w-full bg-transparent font-black text-lg text-slate-800 focus:outline-none">
+                </div>
+                <button id="r1-submit-btn" class="px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 active:scale-95 text-white font-black text-sm rounded-xl shadow-md transition shrink-0">
+                  送出驗證 🚀
+                </button>
+              </div>
+
+              <!-- Mini Number Pad for easy tapping on touch screens -->
+              <div class="grid grid-cols-10 gap-1 pt-1">
+                <button class="r1-numpad-btn p-1.5 rounded-lg bg-white border border-amber-200 text-xs font-black hover:bg-amber-100" data-val="1">1</button>
+                <button class="r1-numpad-btn p-1.5 rounded-lg bg-white border border-amber-200 text-xs font-black hover:bg-amber-100" data-val="2">2</button>
+                <button class="r1-numpad-btn p-1.5 rounded-lg bg-white border border-amber-200 text-xs font-black hover:bg-amber-100" data-val="3">3</button>
+                <button class="r1-numpad-btn p-1.5 rounded-lg bg-white border border-amber-200 text-xs font-black hover:bg-amber-100" data-val="4">4</button>
+                <button class="r1-numpad-btn p-1.5 rounded-lg bg-white border border-amber-200 text-xs font-black hover:bg-amber-100" data-val="5">5</button>
+                <button class="r1-numpad-btn p-1.5 rounded-lg bg-white border border-amber-200 text-xs font-black hover:bg-amber-100" data-val="6">6</button>
+                <button class="r1-numpad-btn p-1.5 rounded-lg bg-white border border-amber-200 text-xs font-black hover:bg-amber-100" data-val="7">7</button>
+                <button class="r1-numpad-btn p-1.5 rounded-lg bg-white border border-amber-200 text-xs font-black hover:bg-amber-100" data-val="8">8</button>
+                <button class="r1-numpad-btn p-1.5 rounded-lg bg-white border border-amber-200 text-xs font-black hover:bg-amber-100" data-val="9">9</button>
+                <button class="r1-numpad-btn p-1.5 rounded-lg bg-white border border-amber-200 text-xs font-black hover:bg-amber-100" data-val="0">0</button>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ------------------------------------------------------------- -->
+      <!-- ROUND 2 PANEL: Animal Feeding Show (Base 30, Pure Food Images) -->
+      <!-- ------------------------------------------------------------- -->
+      <section id="panel-round-2" class="flex flex-col gap-3 hidden">
+        <div class="bg-white/95 rounded-3xl p-4 sm:p-5 shadow-md border-2 border-amber-200 flex flex-col gap-3">
+          
+          <!-- Animal Speech & Prompt -->
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-3 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl p-4 border border-amber-200">
+            <div class="flex items-center gap-3">
+              <span id="r2-animal-avatar" class="text-5xl sm:text-6xl animate-float">🐶</span>
+              <div>
+                <span id="r2-animal-name" class="text-xs font-black px-2.5 py-0.5 rounded-full bg-amber-200 text-amber-900">小柴犬波波</span>
+                <h3 id="r2-prompt-speech" class="text-base sm:text-xl font-black text-amber-900 mt-1">
+                  「我肚子好餓喔！請餵我吃 <span id="r2-target-num" class="text-2xl sm:text-3xl font-black text-rose-600 underline">12</span> 份骨頭！」
+                </h3>
+              </div>
+            </div>
+            <button id="r2-read-prompt-btn" class="px-3 py-1.5 bg-white border border-amber-300 rounded-xl text-amber-800 text-xs font-bold hover:bg-amber-100 transition flex items-center gap-1 shadow-xs shrink-0">
+              <span>🔊</span>
+              <span>聽動物說話</span>
+            </button>
+          </div>
+
+          <!-- Main Feeding Stage: Left Animal (5 cols) & Right 30 Pure Food Images Grid (7 cols) -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 items-stretch">
+            
+            <!-- Animal Interactive Avatar Stage (5 cols) -->
+            <div class="lg:col-span-5 bg-gradient-to-b from-amber-50/60 to-orange-50/40 rounded-2xl p-4 border border-amber-200 flex flex-col items-center justify-between relative overflow-hidden min-h-[250px]">
+              
+              <!-- Target & Fed Status -->
+              <div class="w-full flex items-center justify-between text-xs font-bold text-amber-900">
+                <span class="bg-white/90 px-2.5 py-1 rounded-xl border border-amber-200">
+                  指定目標：<strong id="r2-target-count-display" class="text-rose-600 text-sm">12</strong> 份
+                </span>
+                <span class="bg-white/90 px-2.5 py-1 rounded-xl border border-amber-200">
+                  已餵食：<strong id="r2-fed-count" class="text-emerald-600 text-base">0</strong> 份
+                </span>
+              </div>
+
+              <!-- Animal Avatar & Chewing Text -->
+              <div id="r2-animal-interactive-box" class="flex flex-col items-center justify-center my-3 relative">
+                <div id="r2-animal-stage-face" class="text-7xl sm:text-8xl select-none filter drop-shadow-md transition-transform duration-200">
+                  🐶
+                </div>
+                <div id="r2-chew-text" class="text-xs font-black text-amber-800 bg-white/90 px-3 py-0.5 rounded-full border border-amber-200 mt-2 opacity-0 transition-opacity">
+                  嚼嚼嚼~ 好好吃！😋
+                </div>
+              </div>
+
+              <!-- Floating Hearts / Munch Sparkles -->
+              <div id="r2-hearts-container" class="absolute inset-0 pointer-events-none"></div>
+
+              <!-- Animal Mood Status -->
+              <div id="r2-mood-tip" class="text-xs font-black text-amber-700 bg-amber-100/90 px-3 py-1 rounded-full text-center">
+                肚子好餓，等待投餵中...
+              </div>
+            </div>
+
+            <!-- 30 Food Items Dish (Base 30, No Numbers, Tap to Vanish) (7 cols) -->
+            <div class="lg:col-span-7 bg-white rounded-2xl p-4 border-2 border-amber-200 flex flex-col justify-between gap-3 shadow-xs">
+              
+              <!-- Dish Header -->
+              <div class="flex items-center justify-between border-b border-amber-100 pb-2">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-xl">🥣</span>
+                  <h4 class="font-black text-slate-800 text-xs sm:text-sm">
+                    飼料盤（基數 30，按一張飼料圖片就少一個！）
+                  </h4>
+                </div>
+                <div class="flex items-center gap-1 text-xs font-black">
+                  <span class="text-slate-400">盤中剩餘：</span>
+                  <span class="px-2 py-0.5 rounded-lg bg-rose-100 text-rose-700 text-sm font-black" id="r2-remaining-count">
+                    30 / 30 份
+                  </span>
+                </div>
+              </div>
+
+              <!-- 30 Food Items Grid (Visual Pure Images, Click to Vanish) -->
+              <div class="bg-amber-50/50 rounded-2xl p-2.5 border border-amber-200 min-h-[170px] max-h-[220px] overflow-y-auto custom-scrollbar flex items-center justify-center">
+                <div id="r2-food-30-grid" class="grid grid-cols-6 sm:grid-cols-10 gap-1.5 sm:gap-2 justify-items-center w-full">
+                  <!-- 30 Food buttons dynamically injected (No numbers!) -->
+                </div>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="flex flex-col gap-2">
+                <div class="flex items-center gap-2">
+                  <button id="r2-feed-one-btn" class="flex-1 py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 active:scale-95 text-white font-black text-xs sm:text-sm rounded-xl shadow-sm transition flex items-center justify-center gap-1.5">
+                    <span id="r2-feed-btn-icon" class="text-xl">🦴</span>
+                    <span>按一下少一個 (投餵)</span>
+                  </button>
+                  <button id="r2-undo-feed-btn" class="px-3 py-3 bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 font-bold text-xs rounded-xl border border-slate-300 transition shrink-0" title="退回 1 份飼料">
+                    ↺ 退回 1 份
+                  </button>
+                  <button id="r2-reset-feed-btn" class="px-3 py-3 bg-rose-50 hover:bg-rose-100 active:scale-95 text-rose-700 font-bold text-xs rounded-xl border border-rose-200 transition shrink-0" title="重新放滿 30 份">
+                    🗑️ 重新放滿
+                  </button>
+                </div>
+
+                <button id="r2-confirm-feed-btn" class="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 active:scale-95 text-white font-black text-sm sm:text-base rounded-xl shadow-md transition flex items-center justify-center gap-2">
+                  <span>✨ 餵好了！確認送出</span>
+                </button>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ------------------------------------------------------------- -->
+      <!-- ROUND 3 PANEL: Board Race (Cute Animals: Bunny VS Bear, Start 0) -->
+      <!-- ------------------------------------------------------------- -->
+      <section id="panel-round-3" class="flex flex-col gap-3 hidden">
+        <div class="bg-white/95 rounded-3xl p-4 sm:p-5 shadow-md border-2 border-sky-200 flex flex-col gap-3">
+          
+          <!-- Race Match Header (Cute Animals: Player Bunny vs System Bear) -->
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-2">
+            <div class="flex items-center gap-3">
+              <div class="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-sky-100 text-sky-900 text-xs font-black">
+                <span class="text-base">🐰</span>
+                <span>可愛小兔：<strong id="r3-player-tile-num">第 0 格 (起點)</strong></span>
+              </div>
+              <span class="text-xs font-bold text-slate-400">VS</span>
+              <div class="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-amber-100 text-amber-900 text-xs font-black">
+                <span class="text-base">🐻</span>
+                <span>呆萌小熊：<strong id="r3-bot-tile-num">第 0 格 (起點)</strong></span>
+              </div>
+            </div>
+
+            <!-- Current Step Mission Instruction -->
+            <div class="flex items-center gap-1.5 bg-amber-100 px-3 py-1.5 rounded-xl border border-amber-300">
+              <span class="text-base">🎲</span>
+              <span class="text-xs font-black text-amber-900">
+                系統出題：請讓可愛小兔前進 <strong id="r3-target-steps" class="text-rose-600 text-base underline">7</strong> 步！
+              </span>
+            </div>
+          </div>
+
+          <!-- Monopoly Board Track Canvas / Grid (0 to 30 Tiles) -->
+          <div class="relative bg-gradient-to-r from-sky-50 via-indigo-50 to-emerald-50 rounded-2xl p-3 border-2 border-sky-200 overflow-x-auto custom-scrollbar">
+            <div id="r3-board-track" class="flex items-center gap-2 min-w-[860px] py-3">
+              <!-- 31 Board Tiles (0 to 30) with Animal Markers injected by JS -->
+            </div>
+          </div>
+
+          <!-- Step Jump Interactive Action Stage (Step forward on click) -->
+          <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4">
+            
+            <!-- Jump Status Area with Cute Bunny -->
+            <div class="flex items-center gap-4">
+              <div id="r3-jump-char" class="w-16 h-16 rounded-2xl bg-sky-400 text-white text-4xl flex items-center justify-center shadow-md select-none transition-transform">
+                🐰
+              </div>
+              <div class="flex flex-col">
+                <span class="text-xs font-bold text-slate-500">
+                  本題起點：第 <span id="r3-start-tile-text" class="text-slate-800 font-black">0</span> 格 ➔ 目前停在：第 <span id="r3-curr-tile-text" class="text-sky-600 font-black">0</span> 格
+                </span>
+                <span class="text-2xl sm:text-3xl font-black text-sky-950 mt-0.5">
+                  本題已前進 <span id="r3-steps-moved-count" class="text-rose-600">0</span> 步
+                </span>
+                <span class="text-[11px] text-slate-400">（按一下前進 1 步，看可愛小兔一格一格跳！）</span>
+              </div>
+            </div>
+
+            <!-- Movement & Submit Controls -->
+            <div class="flex items-center gap-2.5 w-full md:w-auto">
+              <!-- Step Forward Button -->
+              <button id="r3-step-forward-btn" class="flex-1 md:flex-none px-6 py-3.5 bg-gradient-to-r from-sky-500 to-indigo-500 hover:from-sky-600 hover:to-indigo-600 active:scale-90 text-white font-black text-sm sm:text-base rounded-2xl shadow-lg transition flex items-center justify-center gap-2 border-2 border-white">
+                <span class="text-xl">🦘</span>
+                <span>按一下前進一步 (數數)</span>
+              </button>
+
+              <!-- Undo Step -->
+              <button id="r3-undo-step-btn" class="p-3 bg-white hover:bg-slate-100 active:scale-95 text-slate-700 font-bold text-xs rounded-xl border border-slate-300 transition" title="退回一步">
+                ↺ 退 1 步
+              </button>
+
+              <!-- Land on Tile / Submit -->
+              <button id="r3-submit-step-btn" class="flex-1 md:flex-none px-6 py-3.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 active:scale-95 text-white font-black text-sm sm:text-base rounded-2xl shadow-lg transition flex items-center justify-center gap-2">
+                <span>🏁 踏穩到達！送出</span>
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ================================================================= -->
+    <!-- FEEDBACK OVERLAY BANNER / WRONG ANSWER NOTICE MODAL -->
+    <!-- ================================================================= -->
+    <div id="feedback-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-5 hidden">
+      <div id="feedback-card" class="bg-white rounded-3xl p-5 sm:p-6 max-w-md w-full shadow-2xl border-4 text-center flex flex-col gap-3 relative animate-pop">
+        <div id="feedback-icon" class="text-5xl animate-bounce">🎉</div>
+        <h3 id="feedback-title" class="text-xl font-black">答對了！太厲害了！</h3>
+        
+        <!-- Explanation / Detailed Discrepancy Breakdown -->
+        <div id="feedback-body" class="p-3 rounded-2xl text-xs sm:text-sm font-bold leading-relaxed text-slate-700 bg-slate-50 border border-slate-200">
+          <!-- Injected explanation -->
+        </div>
+
+        <button id="feedback-next-btn" class="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-black text-sm rounded-2xl shadow-md transition active:scale-95 mt-1">
+          前往下一題 🚀
+        </button>
+      </div>
+    </div>
+
+    <!-- ================================================================= -->
+    <!-- ROUND COMPLETE CELEBRATION MODAL (At 30 questions) -->
+    <!-- ================================================================= -->
+    <div id="round-cleared-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-5 hidden">
+      <div class="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl border-4 border-amber-300 text-center flex flex-col gap-3.5 animate-pop">
+        <div class="text-6xl animate-bounce">👑</div>
+        <h3 class="text-2xl font-black text-amber-900">恭喜完成此回合 30 題大挑戰！</h3>
+        <p class="text-xs text-slate-500 font-bold">你展現了超強的數數毅力與準確度！</p>
+
+        <!-- Stats breakdown -->
+        <div class="bg-amber-50 rounded-2xl p-3 border border-amber-200 flex flex-col gap-1.5 text-xs text-amber-950 font-bold">
+          <div class="flex justify-between">
+            <span>本回合完成題數：</span>
+            <span>30 / 30 題</span>
+          </div>
+          <div class="flex justify-between">
+            <span>答對題數：</span>
+            <span id="cleared-correct-count" class="text-emerald-600 font-black">28 題</span>
+          </div>
+          <div class="flex justify-between">
+            <span>本局獲得點數：</span>
+            <span id="cleared-earned-pts" class="text-rose-600 font-black">+280 分</span>
+          </div>
+        </div>
+
+        <div class="flex gap-2 mt-1">
+          <button id="cleared-play-again-btn" class="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs sm:text-sm rounded-xl shadow-md transition">
+            🔄 再挑戰一次
+          </button>
+          <button id="cleared-home-btn" class="flex-1 py-3 bg-amber-500 hover:bg-amber-600 text-white font-black text-xs sm:text-sm rounded-xl shadow-md transition">
+            🏠 回首頁選關
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ================================================================= -->
+  <!-- JAVASCRIPT GAME ENGINE -->
+  <!-- ================================================================= -->
+  <script>
+    /* ===================================================================
+       1. 音效與合成語音模組 (Web Audio API & Web Speech API)
+       =================================================================== */
+    const Sound = {
+      audioCtx: null,
+      init() {
+        if (!this.audioCtx) {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          if (AudioContextClass) {
+            this.audioCtx = new AudioContextClass();
+          }
+        }
+        if (this.audioCtx && this.audioCtx.state === 'suspended') {
+          this.audioCtx.resume();
+        }
+      },
+      playTone(freq, type = 'sine', duration = 0.15, gainVal = 0.15) {
+        if (!Game.state.soundEnabled) return;
+        try {
+          this.init();
+          if (!this.audioCtx) return;
+          const osc = this.audioCtx.createOscillator();
+          const gain = this.audioCtx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, this.audioCtx.currentTime);
+          gain.gain.setValueAtTime(gainVal, this.audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.audioCtx.currentTime + duration);
+          osc.connect(gain);
+          gain.connect(this.audioCtx.destination);
+          osc.start();
+          osc.stop(this.audioCtx.currentTime + duration);
+        } catch (e) {
+          console.warn('Audio tone error', e);
+        }
+      },
+      pop() {
+        this.playTone(520, 'sine', 0.08, 0.2);
+      },
+      hop() {
+        this.playTone(440, 'triangle', 0.1, 0.25);
+      },
+      munch() {
+        this.playTone(320, 'sawtooth', 0.12, 0.18);
+      },
+      correct() {
+        this.playTone(523.25, 'triangle', 0.12, 0.2);
+        setTimeout(() => this.playTone(659.25, 'triangle', 0.12, 0.2), 90);
+        setTimeout(() => this.playTone(783.99, 'triangle', 0.22, 0.25), 180);
+      },
+      wrong() {
+        this.playTone(220, 'sawtooth', 0.25, 0.25);
+        setTimeout(() => this.playTone(180, 'sawtooth', 0.3, 0.25), 160);
+      }
+    };
+
+    const Voice = {
+      // 語音發音校正：依指示將【數數】修正為 ㄕㄨˇ ㄕㄨˋ，將【角色】修正為 ㄐㄧㄠˇ ㄙㄜˋ
+      correctPronunciation(text) {
+        if (!text) return '';
+        return text
+          // 【數數】ㄕㄨˇ ㄕㄨˋ（繁體中文 TTS 替換為「屬樹」發音為標準動詞加名詞 ㄕㄨˇ ㄕㄨˋ）
+          .replace(/數數/g, '屬樹')
+          // 【角色】ㄐㄧㄠˇ ㄙㄜˋ（繁體中文 TTS 原預設唸 ㄐㄩㄝˊ ㄙㄜˋ，替換為「腳色」即可發出標準 ㄐㄧㄠˇ ㄙㄜˋ）
+          .replace(/角色/g, '腳色');
+      },
+      speak(text, onEndCallback) {
+        if (!Game.state.voiceEnabled) {
+          if (onEndCallback) onEndCallback();
+          return;
+        }
+        if (!('speechSynthesis' in window)) {
+          if (onEndCallback) onEndCallback();
+          return;
+        }
+        try {
+          window.speechSynthesis.cancel(); // cancel pending speech
+          // 套用注音校正轉換字串
+          const phoneticText = this.correctPronunciation(text);
+          const utterance = new SpeechSynthesisUtterance(phoneticText);
+          utterance.lang = 'zh-TW';
+          utterance.rate = 1.0;
+          utterance.pitch = 1.1; // lively friendly pitch
+          if (onEndCallback) {
+            utterance.onend = onEndCallback;
+            utterance.onerror = onEndCallback;
+          }
+          window.speechSynthesis.speak(utterance);
+        } catch (e) {
+          console.warn('Voice speak error', e);
+          if (onEndCallback) onEndCallback();
+        }
+      },
+      stop() {
+        if ('speechSynthesis' in window) {
+          window.speechSynthesis.cancel();
+        }
+      }
+    };
+
+    /* ===================================================================
+       2. 常數與題庫資源
+       =================================================================== */
+    const ITEMS_POOL = ['🍎', '🍓', '⭐️', '🧁', '🎈', '🚗', '🍬', '🌸', '🍪', '🍄'];
+    const ANIMALS_POOL = [
+      { name: '小柴犬波波', avatar: '🐶', food: '骨頭', foodIcon: '🦴' },
+      { name: '萌萌小兔雪球', avatar: '🐰', food: '紅蘿蔔', foodIcon: '🥕' },
+      { name: '橘貓小花', avatar: '🐱', food: '小魚乾', foodIcon: '🐟' },
+      { name: '圓圓熊貓', avatar: '🐼', food: '竹筍', foodIcon: '🎋' },
+      { name: '小猴皮皮', avatar: '🐵', food: '香蕉', foodIcon: '🍌' },
+      { name: '森林棕熊', avatar: '🐻', food: '蜜糖餅', foodIcon: '🍯' }
+    ];
+
+    /* ===================================================================
+       3. 核心遊戲狀態管理
+       =================================================================== */
+    const Game = {
+      state: {
+        score: 0,
+        highScore: 0,
+        soundEnabled: true,
+        voiceEnabled: true,
+        currentRound: null, // 1 | 2 | 3
+        qIndex: 0,          // 0 to 29 (total 30)
+        roundQuestions: [], // 30 random questions for the active round
+        correctCount: 0,
+        earnedRoundPts: 0,
+
+        // Round 1 specifics
+        r1TargetCount: 0,
+        r1CurrentItem: '🍎',
+        r1BasketItems: [],
+        r1MarkedIndexes: new Set(),
+
+        // Round 2 specifics (Base 30 Food Items, pure icons, no numbers)
+        r2Animal: null,
+        r2TargetCount: 0,
+        r2FedCount: 0, // Number of items fed from the 30-item dish
+
+        // Round 3 specifics (Start from Tile 0, Step forward on tap, Cute Animals)
+        r3PlayerPos: 0, // Starts at 0! (🐰 可愛小兔)
+        r3BotPos: 0,    // Starts at 0! (🐻 呆萌小熊)
+        r3StartTileThisTurn: 0,
+        r3TargetSteps: 0, // 1 to 10
+        r3StepsMovedThisTurn: 0,
+
+        // Warmup status
+        isWarmingUp: false,
+        warmupStep: 1,
+        warmupTimer: null
+      },
+
+      init() {
+        // Load persistent score
+        const savedScore = localStorage.getItem('counting_game_score');
+        const savedHigh = localStorage.getItem('counting_game_high');
+        if (savedScore) this.state.score = parseInt(savedScore, 10) || 0;
+        if (savedHigh) this.state.highScore = parseInt(savedHigh, 10) || 0;
+        this.updateHeaderScores();
+
+        this.bindEvents();
+      },
+
+      updateHeaderScores() {
+        document.getElementById('current-score-text').textContent = this.state.score;
+        document.getElementById('high-score-text').textContent = this.state.highScore;
+        localStorage.setItem('counting_game_score', this.state.score);
+        localStorage.setItem('counting_game_high', this.state.highScore);
+      },
+
+      addScore(pts) {
+        this.state.score += pts;
+        this.state.earnedRoundPts += pts;
+        if (this.state.score > this.state.highScore) {
+          this.state.highScore = this.state.score;
+        }
+        this.updateHeaderScores();
+      },
+
+      // Navigation: Go to Home
+      goHome() {
+        Voice.stop();
+        if (this.state.warmupTimer) clearTimeout(this.state.warmupTimer);
+        document.getElementById('warmup-modal').classList.add('hidden');
+        document.getElementById('feedback-modal').classList.add('hidden');
+        document.getElementById('round-cleared-modal').classList.add('hidden');
+        document.getElementById('game-view').classList.add('hidden');
+        document.getElementById('home-view').classList.remove('hidden');
+        this.state.currentRound = null;
+      },
+
+      // Generate 30 random question targets for the selected round
+      generateRoundQuestions(roundNum) {
+        const questions = [];
+        for (let i = 0; i < 30; i++) {
+          if (roundNum === 1) {
+            // Count 1 to 30 items
+            const count = Math.floor(Math.random() * 30) + 1;
+            const item = ITEMS_POOL[Math.floor(Math.random() * ITEMS_POOL.length)];
+            questions.push({ target: count, item: item });
+          } else if (roundNum === 2) {
+            // Feed 1 to 30 food items out of 30 total
+            const count = Math.floor(Math.random() * 30) + 1;
+            const animal = ANIMALS_POOL[Math.floor(Math.random() * ANIMALS_POOL.length)];
+            questions.push({ target: count, animal: animal });
+          } else if (roundNum === 3) {
+            // Board race: roll 1 to 10 steps
+            const steps = Math.floor(Math.random() * 10) + 1;
+            questions.push({ steps: steps });
+          }
+        }
+        return questions;
+      },
+
+      // Start Round: Shows 1-30 warmup read-aloud first
+      startRound(roundNum) {
+        this.state.currentRound = roundNum;
+        this.state.qIndex = 0;
+        this.state.correctCount = 0;
+        this.state.earnedRoundPts = 0;
+        this.state.roundQuestions = this.generateRoundQuestions(roundNum);
+
+        // Reset positions for Round 3 (Starting at 0!)
+        if (roundNum === 3) {
+          this.state.r3PlayerPos = 0;
+          this.state.r3BotPos = 0;
+        }
+
+        // Show Warmup Modal
+        this.startWarmup();
+      },
+
+      /* -------------------------------------------------------------
+         WARMUP 1-30 READ-ALOUD MODULE
+         ------------------------------------------------------------- */
+      startWarmup() {
+        const modal = document.getElementById('warmup-modal');
+        const grid = document.getElementById('warmup-grid');
+        modal.classList.remove('hidden');
+        grid.innerHTML = '';
+
+        // Generate 30 tiles
+        for (let n = 1; n <= 30; n++) {
+          const btn = document.createElement('div');
+          btn.id = `warmup-num-${n}`;
+          btn.className = 'flex flex-col items-center justify-center p-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 font-black text-sm transition-all duration-200';
+          btn.textContent = n;
+          grid.appendChild(btn);
+        }
+
+        this.state.warmupStep = 1;
+        this.state.isWarmingUp = true;
+        this.playNextWarmupNumber();
+      },
+
+      playNextWarmupNumber() {
+        if (!this.state.isWarmingUp) return;
+        if (this.state.warmupStep > 30) {
+          // Finished warmup!
+          document.getElementById('warmup-curr-num').textContent = '朗讀完成！開始遊戲！🎉';
+          Sound.correct();
+          this.state.warmupTimer = setTimeout(() => {
+            this.finishWarmup();
+          }, 900);
+          return;
+        }
+
+        const n = this.state.warmupStep;
+        document.getElementById('warmup-curr-num').textContent = `${n} 🌟`;
+
+        // Highlight number card
+        for (let i = 1; i <= 30; i++) {
+          const el = document.getElementById(`warmup-num-${i}`);
+          if (el) {
+            if (i === n) {
+              el.className = 'flex flex-col items-center justify-center p-2 rounded-xl bg-amber-400 border-2 border-amber-600 text-white font-black text-base shadow-md scale-110 z-10 transition-all duration-150';
+              el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            } else if (i < n) {
+              el.className = 'flex flex-col items-center justify-center p-2 rounded-xl bg-emerald-100 border border-emerald-300 text-emerald-800 font-bold text-xs';
+            } else {
+              el.className = 'flex flex-col items-center justify-center p-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-400 font-bold text-xs';
+            }
+          }
+        }
+
+        Sound.pop();
+        Voice.speak(String(n), () => {
+          if (!this.state.isWarmingUp) return;
+          this.state.warmupStep++;
+          this.state.warmupTimer = setTimeout(() => {
+            this.playNextWarmupNumber();
+          }, 180);
+        });
+      },
+
+      finishWarmup() {
+        this.state.isWarmingUp = false;
+        if (this.state.warmupTimer) clearTimeout(this.state.warmupTimer);
+        Voice.stop();
+        document.getElementById('warmup-modal').classList.add('hidden');
+        
+        // Show Game View
+        document.getElementById('home-view').classList.add('hidden');
+        document.getElementById('game-view').classList.remove('hidden');
+
+        this.renderQuestion();
+      },
+
+      /* -------------------------------------------------------------
+         QUESTION ROUTER & RENDERING
+         ------------------------------------------------------------- */
+      renderQuestion() {
+        const qIndex = this.state.qIndex;
+        document.getElementById('game-q-curr').textContent = qIndex + 1;
+        document.getElementById('game-q-progressbar').style.width = `${((qIndex + 1) / 30) * 100}%`;
+
+        // Hide all round panels
+        document.getElementById('panel-round-1').classList.add('hidden');
+        document.getElementById('panel-round-2').classList.add('hidden');
+        document.getElementById('panel-round-3').classList.add('hidden');
+
+        if (this.state.currentRound === 1) {
+          document.getElementById('game-round-badge').textContent = '第一回合：物品數量配對';
+          document.getElementById('game-round-badge').className = 'px-3 py-1 rounded-xl text-xs font-black bg-emerald-600 text-white';
+          document.getElementById('panel-round-1').classList.remove('hidden');
+          this.loadRound1Question();
+        } else if (this.state.currentRound === 2) {
+          document.getElementById('game-round-badge').textContent = '第二回合：萌寵飼料餵食秀 (基數 30)';
+          document.getElementById('game-round-badge').className = 'px-3 py-1 rounded-xl text-xs font-black bg-amber-600 text-white';
+          document.getElementById('panel-round-2').classList.remove('hidden');
+          this.loadRound2Question();
+        } else if (this.state.currentRound === 3) {
+          document.getElementById('game-round-badge').textContent = '第三回合：大富翁動物跳跳賽 (起點 0)';
+          document.getElementById('game-round-badge').className = 'px-3 py-1 rounded-xl text-xs font-black bg-sky-600 text-white';
+          document.getElementById('panel-round-3').classList.remove('hidden');
+          this.loadRound3Question();
+        }
+      },
+
+      /* =============================================================
+         ROUND 1 LOGIC: Matching & Counting
+         ============================================================= */
+      loadRound1Question() {
+        const q = this.state.roundQuestions[this.state.qIndex];
+        this.state.r1TargetCount = q.target;
+        this.state.r1CurrentItem = q.item;
+        this.state.r1BasketItems = [];
+        this.state.r1MarkedIndexes.clear();
+
+        document.getElementById('r1-basket-count').textContent = '0';
+        document.getElementById('r1-number-input').value = '';
+        this.renderR1Basket();
+
+        // Render Left Target Items
+        const grid = document.getElementById('r1-target-items-grid');
+        grid.innerHTML = '';
+        for (let i = 0; i < q.target; i++) {
+          const itemEl = document.createElement('button');
+          itemEl.className = 'w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-white border border-slate-200 text-xl sm:text-2xl flex items-center justify-center shadow-xs hover:scale-105 active:scale-95 transition relative select-none';
+          itemEl.innerHTML = `<span>${q.item}</span>`;
+          itemEl.onclick = () => this.toggleR1ItemMark(i, itemEl);
+          grid.appendChild(itemEl);
+        }
+
+        Voice.speak(`第 ${this.state.qIndex + 1} 題。請數數看左邊有幾個，並在右邊放入相同的數量！`);
+      },
+
+      toggleR1ItemMark(index, el) {
+        Sound.pop();
+        if (this.state.r1MarkedIndexes.has(index)) {
+          this.state.r1MarkedIndexes.delete(index);
+          el.innerHTML = `<span>${this.state.r1CurrentItem}</span>`;
+          el.classList.remove('border-emerald-500', 'bg-emerald-50');
+        } else {
+          this.state.r1MarkedIndexes.add(index);
+          const currentCount = this.state.r1MarkedIndexes.size;
+          el.innerHTML = `<span class="opacity-30">${this.state.r1CurrentItem}</span><span class="absolute text-xs font-black text-emerald-700 bg-emerald-200/90 px-1 rounded-full">${currentCount}</span>`;
+          el.classList.add('border-emerald-500', 'bg-emerald-50');
+          Voice.speak(String(currentCount));
+        }
+      },
+
+      r1AddItems(count) {
+        for (let i = 0; i < count; i++) {
+          if (this.state.r1BasketItems.length >= 40) break;
+          this.state.r1BasketItems.push(this.state.r1CurrentItem);
+        }
+        Sound.pop();
+        const total = this.state.r1BasketItems.length;
+        Voice.speak(String(total));
+        this.renderR1Basket();
+      },
+
+      r1RemoveOne() {
+        if (this.state.r1BasketItems.length > 0) {
+          this.state.r1BasketItems.pop();
+          Sound.pop();
+          this.renderR1Basket();
+        }
+      },
+
+      r1ClearBasket() {
+        this.state.r1BasketItems = [];
+        Sound.pop();
+        this.renderR1Basket();
+      },
+
+      renderR1Basket() {
+        const shelf = document.getElementById('r1-basket-shelf');
+        shelf.innerHTML = '';
+        const count = this.state.r1BasketItems.length;
+        document.getElementById('r1-basket-count').textContent = count;
+
+        if (count === 0) {
+          shelf.innerHTML = '<span id="r1-empty-tip" class="text-xs text-sky-400 font-bold">點擊下方按鈕把物品放進籃子裡~</span>';
+          return;
+        }
+
+        this.state.r1BasketItems.forEach((item, idx) => {
+          const span = document.createElement('span');
+          span.className = 'w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-white border border-sky-200 text-base sm:text-lg flex items-center justify-center shadow-xs animate-pop';
+          span.textContent = item;
+          span.title = `第 ${idx + 1} 個`;
+          shelf.appendChild(span);
+        });
+      },
+
+      verifyRound1() {
+        const target = this.state.r1TargetCount;
+        const basketCount = this.state.r1BasketItems.length;
+        const enteredVal = parseInt(document.getElementById('r1-number-input').value, 10);
+
+        if (isNaN(enteredVal)) {
+          alert('請在右下方輸入框填入你數出來的數量數字喔！');
+          document.getElementById('r1-number-input').focus();
+          return;
+        }
+
+        const isNumberCorrect = (enteredVal === target);
+        const isBasketCorrect = (basketCount === target);
+
+        if (isNumberCorrect && isBasketCorrect) {
+          this.showFeedback(true, '太棒了！完全正確！', `左邊共有 ${target} 個 ${this.state.r1CurrentItem}，你放了 ${basketCount} 個，並正確填入 ${enteredVal}！`, 10);
+        } else if (isNumberCorrect && !isBasketCorrect) {
+          this.showFeedback(true, '數字正確！但籃子要放準確喔！', `你算出了正確數量是 ${target}！不過籃子裡放了 ${basketCount} 個，下次記得也放剛好喔！`, 8);
+        } else {
+          const diff = enteredVal - target;
+          const diffText = diff > 0 ? `多填了 ${diff} 個` : `少填了 ${Math.abs(diff)} 個`;
+          this.showFeedback(
+            false,
+            '哎呀！算錯囉，再接再厲！',
+            `左邊一共有 <span class="text-emerald-600 font-black text-base">${target}</span> 個 ${this.state.r1CurrentItem}。<br>` +
+            `你填了 <strong>${enteredVal}</strong>（${diffText}），籃子裡放了 <strong>${basketCount}</strong> 個。<br>` +
+            `<span class="text-rose-600 font-bold">正確答案是 ${target}！</span>`
+          );
+        }
+      },
+
+      /* =============================================================
+         ROUND 2 LOGIC: Animal Feeding (Base 30, No Numbers, Vanish on Tap)
+         ============================================================= */
+      loadRound2Question() {
+        const q = this.state.roundQuestions[this.state.qIndex];
+        this.state.r2Animal = q.animal;
+        this.state.r2TargetCount = q.target;
+        this.state.r2FedCount = 0; // Starts with 0 fed, 30 remaining
+
+        document.getElementById('r2-animal-avatar').textContent = q.animal.avatar;
+        document.getElementById('r2-animal-stage-face').textContent = q.animal.avatar;
+        document.getElementById('r2-animal-name').textContent = q.animal.name;
+        document.getElementById('r2-target-num').textContent = q.target;
+        document.getElementById('r2-target-count-display').textContent = q.target;
+        document.getElementById('r2-fed-count').textContent = '0';
+        document.getElementById('r2-remaining-count').textContent = '30 / 30 份';
+        document.getElementById('r2-feed-btn-icon').textContent = q.animal.foodIcon;
+        document.getElementById('r2-mood-tip').textContent = '肚子好餓，等待投餵中...';
+
+        document.getElementById('r2-prompt-speech').innerHTML = `「我肚子好餓喔！請餵我吃 <span class="text-2xl sm:text-3xl font-black text-rose-600 underline">${q.target}</span> 份${q.animal.food}！」`;
+
+        this.renderR2FoodGrid();
+
+        Voice.speak(`${q.animal.name}說：我肚子好餓喔！盤子裡原本有 30 份${q.animal.food}，請按飼料圖片餵我吃 ${q.target} 份！`);
+      },
+
+      renderR2FoodGrid() {
+        const grid = document.getElementById('r2-food-30-grid');
+        grid.innerHTML = '';
+        const foodIcon = this.state.r2Animal ? this.state.r2Animal.foodIcon : '🦴';
+        const fed = this.state.r2FedCount;
+        const remaining = 30 - fed;
+        document.getElementById('r2-remaining-count').textContent = `${remaining} / 30 份`;
+        document.getElementById('r2-fed-count').textContent = fed;
+
+        // Render 30 item grid - PURE ICONS, NO NUMBERS, VANISH ON TAP!
+        for (let i = 1; i <= 30; i++) {
+          const itemBtn = document.createElement('button');
+          itemBtn.id = `r2-food-item-${i}`;
+          if (i <= remaining) {
+            // Food still on the dish: pure icon, NO numbers!
+            itemBtn.className = 'w-9 h-9 sm:w-11 sm:h-11 rounded-2xl bg-white border-2 border-amber-300 text-xl sm:text-2xl flex items-center justify-center shadow-xs hover:scale-110 active:scale-90 transition-all duration-150 cursor-pointer select-none';
+            itemBtn.innerHTML = `<span>${foodIcon}</span>`;
+            itemBtn.title = `點擊這份飼料餵給小動物 (按一下少一個)`;
+            itemBtn.onclick = () => this.r2FeedOne();
+          } else {
+            // Eaten/vanished slot: becomes completely invisible/empty!
+            itemBtn.className = 'w-9 h-9 sm:w-11 sm:h-11 rounded-2xl bg-amber-100/10 border border-dashed border-amber-200/30 opacity-0 pointer-events-none select-none transition-all duration-200';
+            itemBtn.disabled = true;
+          }
+          grid.appendChild(itemBtn);
+        }
+      },
+
+      r2FeedOne() {
+        if (this.state.r2FedCount >= 30) {
+          alert('盤子裡的 30 份飼料已經全部餵完囉！');
+          return;
+        }
+
+        this.state.r2FedCount++;
+        this.renderR2FoodGrid();
+
+        // Animal Chewing Animation
+        const face = document.getElementById('r2-animal-stage-face');
+        face.classList.remove('animate-chew');
+        void face.offsetWidth; // trigger reflow
+        face.classList.add('animate-chew');
+
+        // Chew text
+        const chewText = document.getElementById('r2-chew-text');
+        chewText.style.opacity = '1';
+        setTimeout(() => { chewText.style.opacity = '0'; }, 500);
+
+        // Mood update
+        const target = this.state.r2TargetCount;
+        const fed = this.state.r2FedCount;
+        const moodTip = document.getElementById('r2-mood-tip');
+        if (fed < target) {
+          moodTip.textContent = `嚼嚼嚼~ 還需要 ${target - fed} 份！`;
+        } else if (fed === target) {
+          moodTip.textContent = `哇！剛好吃飽了！快點擊確認送出吧！😋`;
+        } else {
+          moodTip.textContent = `哎呀！吃太撐啦，多餵了 ${fed - target} 份！😅`;
+        }
+
+        // Sound & Heart effect
+        Sound.munch();
+        this.spawnHeart();
+
+        // Sing number
+        Voice.speak(String(this.state.r2FedCount));
+      },
+
+      spawnHeart() {
+        const container = document.getElementById('r2-hearts-container');
+        const heart = document.createElement('div');
+        heart.className = 'absolute text-2xl select-none';
+        heart.style.left = `${35 + Math.random() * 30}%`;
+        heart.style.bottom = '30%';
+        heart.style.animation = 'heart-rise 0.8s ease-out forwards';
+        heart.textContent = ['💖', '✨', '😋', '🌟'][Math.floor(Math.random() * 4)];
+        container.appendChild(heart);
+        setTimeout(() => heart.remove(), 800);
+      },
+
+      r2UndoFeed() {
+        if (this.state.r2FedCount > 0) {
+          this.state.r2FedCount--;
+          this.renderR2FoodGrid();
+          Sound.pop();
+
+          const target = this.state.r2TargetCount;
+          const fed = this.state.r2FedCount;
+          const moodTip = document.getElementById('r2-mood-tip');
+          if (fed === 0) moodTip.textContent = '肚子好餓，等待投餵中...';
+          else if (fed < target) moodTip.textContent = `嚼嚼嚼~ 還需要 ${target - fed} 份！`;
+          else if (fed === target) moodTip.textContent = `哇！剛好吃飽了！快點擊確認送出吧！😋`;
+          else moodTip.textContent = `哎呀！吃太撐啦，多餵了 ${fed - target} 份！😅`;
+        }
+      },
+
+      r2ResetFeed() {
+        this.state.r2FedCount = 0;
+        this.renderR2FoodGrid();
+        document.getElementById('r2-mood-tip').textContent = '盤子已重新放滿 30 份飼料！等待投餵中...';
+        Sound.pop();
+      },
+
+      verifyRound2() {
+        const target = this.state.r2TargetCount;
+        const fed = this.state.r2FedCount;
+        const animal = this.state.r2Animal;
+        const remaining = 30 - fed;
+        const correctRemaining = 30 - target;
+
+        if (fed === target) {
+          // Perfectly satisfied
+          this.showFeedback(
+            true,
+            '好飽好滿足！謝謝你！',
+            `${animal.name} 高興地把 ${target} 份 ${animal.food} 全部吃光光了！<br>` +
+            `原本盤子有 30 份飼料，你按了 <strong>${fed}</strong> 次，盤子剩下 <strong>${remaining}</strong> 份，數量完全正確！`,
+            10
+          );
+        } else {
+          // Discrepancy
+          const diff = fed - target;
+          const diffText = diff > 0 ? `吃太撐啦，多餵了 ${diff} 份！` : `還差 ${Math.abs(diff)} 份沒吃飽呢！`;
+          this.showFeedback(
+            false,
+            '嗚嗚～數量不太對喔！',
+            `${animal.name} 要求吃 <strong class="text-emerald-600 text-base">${target}</strong> 份${animal.food}。<br>` +
+            `你按了 <strong>${fed}</strong> 個飼料（${diffText}），盤子裡剩下 <strong>${remaining}</strong> 份。<br>` +
+            `<span class="text-rose-600 font-bold">正確應該按 ${target} 個飼料，盤子要剩下 ${correctRemaining} 份喔！</span>`
+          );
+        }
+      },
+
+      /* =============================================================
+         ROUND 3 LOGIC: Monopoly Board Race (Cute Animals: Bunny VS Bear)
+         ============================================================= */
+      loadRound3Question() {
+        const q = this.state.roundQuestions[this.state.qIndex];
+        this.state.r3TargetSteps = q.steps;
+        this.state.r3StartTileThisTurn = this.state.r3PlayerPos; // Start tile of this question (begins at 0!)
+        this.state.r3StepsMovedThisTurn = 0;
+
+        document.getElementById('r3-target-steps').textContent = q.steps;
+        document.getElementById('r3-start-tile-text').textContent = this.state.r3StartTileThisTurn;
+        document.getElementById('r3-curr-tile-text').textContent = this.state.r3PlayerPos;
+        document.getElementById('r3-steps-moved-count').textContent = '0';
+        document.getElementById('r3-player-tile-num').textContent = `第 ${this.state.r3PlayerPos} 格 ${this.state.r3PlayerPos === 0 ? '(起點)' : ''}`;
+        document.getElementById('r3-bot-tile-num').textContent = `第 ${this.state.r3BotPos} 格 ${this.state.r3BotPos === 0 ? '(起點)' : ''}`;
+
+        this.renderR3Board();
+
+        Voice.speak(`系統指示：請讓可愛小兔前進 ${q.steps} 步！按一下走一步，邊走邊數數看！`);
+      },
+
+      renderR3Board() {
+        const track = document.getElementById('r3-board-track');
+        track.innerHTML = '';
+
+        // 0 to 30 Tiles! (Starting from 0)
+        for (let i = 0; i <= 30; i++) {
+          const tile = document.createElement('div');
+          tile.id = `r3-tile-${i}`;
+          tile.className = 'w-14 h-18 rounded-2xl bg-white border-2 border-slate-200 flex flex-col items-center justify-between p-1.5 shadow-xs relative shrink-0 transition-all duration-300';
+          
+          // Number Header
+          const numSpan = document.createElement('span');
+          if (i === 0) {
+            numSpan.className = 'text-[9px] font-black text-amber-700 bg-amber-100 px-1 rounded';
+            numSpan.textContent = '🏁 起點 0';
+          } else {
+            numSpan.className = 'text-[10px] font-black text-slate-400';
+            numSpan.textContent = `#${i}`;
+          }
+          tile.appendChild(numSpan);
+
+          // Tile Marker Container (Cute Animals: Bunny 🐰 & Bear 🐻)
+          const markerContainer = document.createElement('div');
+          markerContainer.className = 'flex items-center justify-center gap-0.5 text-lg my-1';
+
+          if (this.state.r3PlayerPos === i) {
+            markerContainer.innerHTML += '<span title="可愛小兔" class="animate-bounce">🐰</span>';
+            tile.classList.remove('border-slate-200', 'bg-white');
+            tile.classList.add('border-sky-500', 'bg-sky-50', 'ring-2', 'ring-sky-300');
+          }
+          if (this.state.r3BotPos === i) {
+            markerContainer.innerHTML += '<span title="呆萌小熊">🐻</span>';
+            tile.classList.add('border-amber-400');
+          }
+
+          tile.appendChild(markerContainer);
+
+          // Milestone icon
+          const iconSpan = document.createElement('span');
+          iconSpan.className = 'text-[10px] font-bold text-slate-400';
+          if (i === 0) iconSpan.textContent = 'START';
+          else if (i === 30) iconSpan.textContent = '🏆 終點';
+          else if (i % 5 === 0) iconSpan.textContent = '⭐';
+          else iconSpan.textContent = '・';
+          tile.appendChild(iconSpan);
+
+          track.appendChild(tile);
+        }
+
+        // Scroll active player tile smoothly into view
+        const activeTile = document.getElementById(`r3-tile-${this.state.r3PlayerPos}`);
+        if (activeTile) {
+          activeTile.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        }
+      },
+
+      r3StepForward() {
+        if (this.state.r3PlayerPos >= 30) {
+          alert('可愛小兔已經到達終點第 30 格囉！');
+          return;
+        }
+
+        this.state.r3PlayerPos++;
+        this.state.r3StepsMovedThisTurn++;
+
+        document.getElementById('r3-curr-tile-text').textContent = this.state.r3PlayerPos;
+        document.getElementById('r3-steps-moved-count').textContent = this.state.r3StepsMovedThisTurn;
+        document.getElementById('r3-player-tile-num').textContent = `第 ${this.state.r3PlayerPos} 格`;
+
+        this.renderR3Board();
+
+        // Character Hop Animation
+        const char = document.getElementById('r3-jump-char');
+        char.classList.remove('animate-hop');
+        void char.offsetWidth;
+        char.classList.add('animate-hop');
+
+        Sound.hop();
+        Voice.speak(String(this.state.r3StepsMovedThisTurn));
+      },
+
+      r3UndoStep() {
+        if (this.state.r3StepsMovedThisTurn > 0 && this.state.r3PlayerPos > 0) {
+          this.state.r3PlayerPos--;
+          this.state.r3StepsMovedThisTurn--;
+
+          document.getElementById('r3-curr-tile-text').textContent = this.state.r3PlayerPos;
+          document.getElementById('r3-steps-moved-count').textContent = this.state.r3StepsMovedThisTurn;
+          document.getElementById('r3-player-tile-num').textContent = `第 ${this.state.r3PlayerPos} 格 ${this.state.r3PlayerPos === 0 ? '(起點)' : ''}`;
+
+          this.renderR3Board();
+          Sound.pop();
+        }
+      },
+
+      verifyRound3() {
+        const target = this.state.r3TargetSteps;
+        const moved = this.state.r3StepsMovedThisTurn;
+        const startTile = this.state.r3StartTileThisTurn;
+        const expectedTile = startTile + target;
+
+        if (moved === target) {
+          // Correct! Bot takes a random turn
+          const botSteps = Math.floor(Math.random() * 6) + 1;
+          this.state.r3BotPos += botSteps;
+          if (this.state.r3BotPos > 30) this.state.r3BotPos = 30;
+
+          this.renderR3Board();
+
+          this.showFeedback(
+            true,
+            '步伐精準！大步前進！',
+            `太神了！你按了 ${target} 次前進，可愛小兔精準從第 ${startTile} 格前進到第 <strong>${this.state.r3PlayerPos}</strong> 格！<br>` +
+            `呆萌小熊也前進了 ${botSteps} 步到達第 ${this.state.r3BotPos} 格！`,
+            10
+          );
+        } else {
+          // Wrong!
+          const diff = moved - target;
+          const diffText = diff > 0 ? `多走了 ${diff} 步` : `少走了 ${Math.abs(diff)} 步`;
+
+          // Bot takes an advance
+          const botSteps = Math.floor(Math.random() * 5) + 1;
+          this.state.r3BotPos += botSteps;
+          if (this.state.r3BotPos > 30) this.state.r3BotPos = 30;
+
+          // Automatically place player on the correct expected tile so race can proceed smoothly
+          this.state.r3PlayerPos = (expectedTile <= 30) ? expectedTile : 30;
+          this.renderR3Board();
+
+          this.showFeedback(
+            false,
+            '步數算錯囉！小兔絆倒了😵‍💫',
+            `題目指示前進 <strong class="text-emerald-600 text-base">${target}</strong> 步。<br>` +
+            `你讓可愛小兔走了 <strong>${moved}</strong> 步（${diffText}）！<br>` +
+            `<span class="text-rose-600 font-bold">正確應該前進 ${target} 步到達第 ${expectedTile} 格！小熊趁機追上了喔！</span>`
+          );
+        }
+      },
+
+      /* =============================================================
+         FEEDBACK MODAL & CELEBRATIONS
+         ============================================================= */
+      showFeedback(isCorrect, title, messageHtml, ptsEarned = 0) {
+        const modal = document.getElementById('feedback-modal');
+        const card = document.getElementById('feedback-card');
+        const icon = document.getElementById('feedback-icon');
+        const titleEl = document.getElementById('feedback-title');
+        const bodyEl = document.getElementById('feedback-body');
+
+        modal.classList.remove('hidden');
+
+        if (isCorrect) {
+          Sound.correct();
+          this.state.correctCount++;
+          this.addScore(ptsEarned);
+
+          icon.textContent = '🌟';
+          titleEl.textContent = title;
+          titleEl.className = 'text-xl font-black text-emerald-600';
+          card.className = 'bg-white rounded-3xl p-5 sm:p-6 max-w-md w-full shadow-2xl border-4 border-emerald-400 text-center flex flex-col gap-3 relative animate-pop';
+          bodyEl.innerHTML = messageHtml + `<div class="mt-2 text-emerald-700 font-black">+${ptsEarned} 點數入袋！⭐</div>`;
+          Voice.speak('答對了！太厲害了！');
+        } else {
+          Sound.wrong();
+          icon.textContent = '❌';
+          titleEl.textContent = title;
+          titleEl.className = 'text-xl font-black text-rose-600';
+          card.className = 'bg-white rounded-3xl p-5 sm:p-6 max-w-md w-full shadow-2xl border-4 border-rose-400 text-center flex flex-col gap-3 relative animate-shake';
+          bodyEl.innerHTML = messageHtml;
+          Voice.speak('哎呀！答錯了，請看正確答案喔！');
+        }
+      },
+
+      advanceNextQuestion() {
+        document.getElementById('feedback-modal').classList.add('hidden');
+        this.state.qIndex++;
+
+        if (this.state.qIndex >= 30) {
+          this.showRoundClearedModal();
+        } else {
+          this.renderQuestion();
+        }
+      },
+
+      showRoundClearedModal() {
+        Sound.correct();
+        document.getElementById('cleared-correct-count').textContent = `${this.state.correctCount} / 30 題`;
+        document.getElementById('cleared-earned-pts').textContent = `+${this.state.earnedRoundPts} 分`;
+        document.getElementById('round-cleared-modal').classList.remove('hidden');
+
+        Voice.speak(`恭喜你！完成此回合全部 30 題挑戰！一共答對 ${this.state.correctCount} 題！獲得 ${this.state.earnedRoundPts} 點！`);
+      },
+
+      /* =============================================================
+         EVENT BINDINGS
+         ============================================================= */
+      bindEvents() {
+        // Global Toggles
+        document.getElementById('nav-home-btn').onclick = () => {
+          if (confirm('確定要回到主頁選關嗎？')) {
+            this.goHome();
+          }
+        };
+
+        document.getElementById('exit-round-btn').onclick = () => {
+          if (confirm('確定要結束目前回合回主頁嗎？')) {
+            this.goHome();
+          }
+        };
+
+        document.getElementById('restart-round-btn').onclick = () => {
+          if (confirm('確定要重新開始玩這個回合嗎？')) {
+            this.startRound(this.state.currentRound);
+          }
+        };
+
+        document.getElementById('sound-toggle-btn').onclick = (e) => {
+          this.state.soundEnabled = !this.state.soundEnabled;
+          e.currentTarget.textContent = this.state.soundEnabled ? '🔔' : '🔕';
+        };
+
+        document.getElementById('voice-toggle-btn').onclick = (e) => {
+          this.state.voiceEnabled = !this.state.voiceEnabled;
+          e.currentTarget.textContent = this.state.voiceEnabled ? '🗣️' : '🤐';
+        };
+
+        document.getElementById('reset-all-data-btn').onclick = () => {
+          if (confirm('確定要清空所有冒險紀錄與點數嗎？')) {
+            localStorage.removeItem('counting_game_score');
+            localStorage.removeItem('counting_game_high');
+            this.state.score = 0;
+            this.state.highScore = 0;
+            this.updateHeaderScores();
+            alert('紀錄已重置！');
+          }
+        };
+
+        // Warmup Modal
+        document.getElementById('skip-warmup-btn').onclick = () => {
+          this.finishWarmup();
+        };
+
+        document.getElementById('replay-warmup-btn').onclick = () => {
+          if (this.state.warmupTimer) clearTimeout(this.state.warmupTimer);
+          Voice.stop();
+          this.state.warmupStep = 1;
+          this.state.isWarmingUp = true;
+          this.playNextWarmupNumber();
+        };
+
+        // Round 1 Buttons
+        document.getElementById('r1-add-one-btn').onclick = () => this.r1AddItems(1);
+        document.getElementById('r1-add-five-btn').onclick = () => this.r1AddItems(5);
+        document.getElementById('r1-sub-one-btn').onclick = () => this.r1RemoveOne();
+        document.getElementById('r1-clear-basket-btn').onclick = () => this.r1ClearBasket();
+        document.getElementById('r1-clear-mark-btn').onclick = () => {
+          this.state.r1MarkedIndexes.clear();
+          const grid = document.getElementById('r1-target-items-grid');
+          Array.from(grid.children).forEach((btn) => {
+            btn.innerHTML = `<span>${this.state.r1CurrentItem}</span>`;
+            btn.classList.remove('border-emerald-500', 'bg-emerald-50');
+          });
+          Sound.pop();
+        };
+        document.getElementById('r1-read-left-btn').onclick = () => {
+          Voice.speak(`左邊一共有 ${this.state.r1TargetCount} 個 ${this.state.r1CurrentItem}。`);
+        };
+        document.getElementById('r1-submit-btn').onclick = () => this.verifyRound1();
+
+        // Mini Numpad for Round 1
+        document.querySelectorAll('.r1-numpad-btn').forEach(btn => {
+          btn.onclick = () => {
+            const val = btn.getAttribute('data-val');
+            const input = document.getElementById('r1-number-input');
+            input.value = input.value + val;
+            Sound.pop();
+          };
+        });
+
+        // Round 2 Buttons (Base 30 Food Items)
+        document.getElementById('r2-feed-one-btn').onclick = () => this.r2FeedOne();
+        document.getElementById('r2-undo-feed-btn').onclick = () => this.r2UndoFeed();
+        document.getElementById('r2-reset-feed-btn').onclick = () => this.r2ResetFeed();
+        document.getElementById('r2-confirm-feed-btn').onclick = () => this.verifyRound2();
+        document.getElementById('r2-read-prompt-btn').onclick = () => {
+          if (this.state.r2Animal) {
+            Voice.speak(`${this.state.r2Animal.name}說：我肚子好餓喔！請餵我吃 ${this.state.r2TargetCount} 份${this.state.r2Animal.food}！`);
+          }
+        };
+
+        // Round 3 Buttons (Start at 0, Step forward on tap, Cute Animals)
+        document.getElementById('r3-step-forward-btn').onclick = () => this.r3StepForward();
+        document.getElementById('r3-undo-step-btn').onclick = () => this.r3UndoStep();
+        document.getElementById('r3-submit-step-btn').onclick = () => this.verifyRound3();
+
+        // Feedback Next Button
+        document.getElementById('feedback-next-btn').onclick = () => this.advanceNextQuestion();
+
+        // Round Cleared Modal
+        document.getElementById('cleared-play-again-btn').onclick = () => {
+          document.getElementById('round-cleared-modal').classList.add('hidden');
+          this.startRound(this.state.currentRound);
+        };
+        document.getElementById('cleared-home-btn').onclick = () => {
+          this.goHome();
+        };
+      }
+    };
+
+    // Initialize on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      Game.init();
+    });
+  </script>
+</body>
+</html>
